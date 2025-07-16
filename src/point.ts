@@ -1,5 +1,5 @@
 import { Geometry } from './geometry';
-import { GeometryOptions } from './types';
+import { GeoJSONOptions, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { BinaryWriter } from './binarywriter';
 import * as ZigZag from './zigzag';
@@ -42,7 +42,9 @@ export class Point extends Geometry {
     return point;
   }
 
-  toWkt(): string {
+  toWkt(isNested: boolean = false): string {
+    if (isNested) return this.getWktCoordinate();
+
     if (
       typeof this.x === 'undefined' &&
       typeof this.y === 'undefined' &&
@@ -52,9 +54,20 @@ export class Point extends Geometry {
       return this.getWktType(GEOMETRY_TYPES.Point.wkt, true);
     }
 
-    return (
-      this.getWktType(GEOMETRY_TYPES.Point.wkt, false) + '(' + this.getWktCoordinate(this) + ')'
-    );
+    return this.getWktType(GEOMETRY_TYPES.Point.wkt, false) + '(' + this.getWktCoordinate() + ')';
+  }
+
+  private getWktCoordinate(): string {
+    let coordinates = `${this.x} ${this.y}`;
+
+    if (this.hasZ) {
+      coordinates += ` ${this.z}`;
+    }
+    if (this.hasM) {
+      coordinates += ` ${this.m}`;
+    }
+
+    return coordinates;
   }
 
   toWkb(parentOptions?: GeometryOptions, isNested: boolean = false): Buffer {
@@ -161,17 +174,21 @@ export class Point extends Geometry {
     return size;
   }
 
-  toGeoJSON(options?: any): any {
+  toGeoJSON(options?: GeoJSONOptions, isNested: boolean = false): any {
+    let coordinates: number[];
+    if (typeof this.x === 'undefined' && typeof this.y === 'undefined') {
+      coordinates = [];
+    } else if (typeof this.z !== 'undefined') {
+      coordinates = [this.x, this.y, this.z];
+    } else {
+      coordinates = [this.x, this.y];
+    }
+
+    if (isNested) return coordinates;
+
     const geoJSON = super.toGeoJSON(options);
     geoJSON.type = GEOMETRY_TYPES.Point.geoJSON;
-
-    if (typeof this.x === 'undefined' && typeof this.y === 'undefined') {
-      geoJSON.coordinates = [];
-    } else if (typeof this.z !== 'undefined') {
-      geoJSON.coordinates = [this.x, this.y, this.z];
-    } else {
-      geoJSON.coordinates = [this.x, this.y];
-    }
+    geoJSON.coordinates = coordinates;
 
     return geoJSON;
   }

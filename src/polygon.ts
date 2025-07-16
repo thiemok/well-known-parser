@@ -1,5 +1,5 @@
 import { Geometry } from './geometry';
-import { GeometryOptions } from './types';
+import { GeoJSONOptions, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
 import { BinaryWriter } from './binarywriter';
@@ -40,7 +40,9 @@ export class Polygon extends Geometry {
     return polygon;
   }
 
-  toWkt(): string {
+  toWkt(isNested: boolean = false): string {
+    if (isNested) return this.toInnerWkt();
+
     if (this.exteriorRing.length === 0) {
       return this.getWktType(GEOMETRY_TYPES.Polygon.wkt, true);
     }
@@ -48,21 +50,21 @@ export class Polygon extends Geometry {
     return this.getWktType(GEOMETRY_TYPES.Polygon.wkt, false) + this.toInnerWkt();
   }
 
-  toInnerWkt(): string {
+  private toInnerWkt(): string {
     let innerWkt = '((';
 
-    for (let i = 0; i < this.exteriorRing.length; i++) {
-      innerWkt += this.getWktCoordinate(this.exteriorRing[i]) + ',';
+    for (const point of this.exteriorRing) {
+      innerWkt += point.toWkt(true) + ',';
     }
 
     innerWkt = innerWkt.slice(0, -1);
     innerWkt += ')';
 
-    for (let i = 0; i < this.interiorRings.length; i++) {
+    for (const ring of this.interiorRings) {
       innerWkt += ',(';
 
-      for (let j = 0; j < this.interiorRings[i].length; j++) {
-        innerWkt += this.getWktCoordinate(this.interiorRings[i][j]) + ',';
+      for (const point of ring) {
+        innerWkt += point.toWkt(true) + ',';
       }
 
       innerWkt = innerWkt.slice(0, -1);
@@ -153,46 +155,33 @@ export class Polygon extends Geometry {
     return size;
   }
 
-  toGeoJSON(options?: any): any {
-    const geoJSON = super.toGeoJSON(options);
-    geoJSON.type = GEOMETRY_TYPES.Polygon.geoJSON;
-    geoJSON.coordinates = [];
+  toGeoJSON(options?: GeoJSONOptions, isNested: boolean = false): any {
+    const coordinates: number[][][] = [];
 
     if (this.exteriorRing.length > 0) {
       const exteriorRing: number[][] = [];
 
-      for (let i = 0; i < this.exteriorRing.length; i++) {
-        if (this.hasZ && this.exteriorRing[i].z !== undefined) {
-          exteriorRing.push([
-            this.exteriorRing[i].x,
-            this.exteriorRing[i].y,
-            this.exteriorRing[i].z,
-          ]);
-        } else {
-          exteriorRing.push([this.exteriorRing[i].x, this.exteriorRing[i].y]);
-        }
+      for (const point of this.exteriorRing) {
+        exteriorRing.push(point.toGeoJSON(undefined, true));
       }
 
-      geoJSON.coordinates.push(exteriorRing);
+      coordinates.push(exteriorRing);
     }
 
-    for (let j = 0; j < this.interiorRings.length; j++) {
+    for (const ring of this.interiorRings) {
       const interiorRing: number[][] = [];
 
-      for (let k = 0; k < this.interiorRings[j].length; k++) {
-        if (this.hasZ && this.interiorRings[j][k].z !== undefined) {
-          interiorRing.push([
-            this.interiorRings[j][k].x,
-            this.interiorRings[j][k].y,
-            this.interiorRings[j][k].z,
-          ]);
-        } else {
-          interiorRing.push([this.interiorRings[j][k].x, this.interiorRings[j][k].y]);
-        }
+      for (const point of ring) {
+        interiorRing.push(point.toGeoJSON(undefined, true));
       }
-
-      geoJSON.coordinates.push(interiorRing);
+      coordinates.push(interiorRing);
     }
+
+    if (isNested) return coordinates;
+
+    const geoJSON = super.toGeoJSON(options);
+    geoJSON.type = GEOMETRY_TYPES.Polygon.geoJSON;
+    geoJSON.coordinates = coordinates;
 
     return geoJSON;
   }

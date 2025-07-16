@@ -1,6 +1,6 @@
 import { BinaryWriter } from './binarywriter';
 import * as ZigZag from './zigzag';
-import { GeometryOptions, GeoJSONOptions, TwkbPrecision } from './types';
+import { GeoJSONOptions, GeometryOptions, TwkbPrecision } from './types';
 
 export class Geometry {
   srid?: number;
@@ -51,23 +51,17 @@ export class Geometry {
     return wkt;
   }
 
-  protected getWktCoordinate(point: { x: number; y: number; z?: number; m?: number }): string {
-    let coordinates = `${point.x} ${point.y}`;
-
-    if (this.hasZ) {
-      coordinates += ` ${point.z}`;
-    }
-    if (this.hasM) {
-      coordinates += ` ${point.m}`;
-    }
-
-    return coordinates;
-  }
-
-  protected writeWkbType(wkb: BinaryWriter, geometryType: number, parentOptions?: GeometryOptions): void {
+  protected writeWkbType(
+    wkb: BinaryWriter,
+    geometryType: number,
+    parentOptions?: GeometryOptions
+  ): void {
     let dimensionType = 0;
 
-    if (typeof this.srid === 'undefined' && (!parentOptions || typeof parentOptions.srid === 'undefined')) {
+    if (
+      typeof this.srid === 'undefined' &&
+      (!parentOptions || typeof parentOptions.srid === 'undefined')
+    ) {
       if (this.hasZ && this.hasM) {
         dimensionType += 3000;
       } else if (this.hasZ) {
@@ -87,20 +81,29 @@ export class Geometry {
     wkb.writeUInt32LE((dimensionType + geometryType) >>> 0, true);
   }
 
-  static getTwkbPrecision(xyPrecision: number, zPrecision: number, mPrecision: number): TwkbPrecision {
+  static getTwkbPrecision(
+    xyPrecision: number,
+    zPrecision: number,
+    mPrecision: number
+  ): TwkbPrecision {
     return {
       xy: xyPrecision,
       z: zPrecision,
       m: mPrecision,
       xyFactor: Math.pow(10, xyPrecision),
       zFactor: Math.pow(10, zPrecision),
-      mFactor: Math.pow(10, mPrecision)
+      mFactor: Math.pow(10, mPrecision),
     };
   }
 
-  protected writeTwkbHeader(twkb: BinaryWriter, geometryType: number, precision: TwkbPrecision, isEmpty: boolean): void {
+  protected writeTwkbHeader(
+    twkb: BinaryWriter,
+    geometryType: number,
+    precision: TwkbPrecision,
+    isEmpty: boolean
+  ): void {
     const type = (ZigZag.encode(precision.xy) << 4) + geometryType;
-    let metadataHeader = ((this.hasZ || this.hasM) ? 1 : 0) << 3;
+    let metadataHeader = (this.hasZ || this.hasM ? 1 : 0) << 3;
     metadataHeader += isEmpty ? 1 << 4 : 0;
 
     twkb.writeUInt8(type);
@@ -136,15 +139,15 @@ export class Geometry {
           geoJSON.crs = {
             type: 'name',
             properties: {
-              name: `EPSG:${this.srid}`
-            }
+              name: `EPSG:${this.srid}`,
+            },
           };
         } else if (options.longCrs) {
           geoJSON.crs = {
             type: 'name',
             properties: {
-              name: `urn:ogc:def:crs:EPSG::${this.srid}`
-            }
+              name: `urn:ogc:def:crs:EPSG::${this.srid}`,
+            },
           };
         }
       }

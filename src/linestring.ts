@@ -1,5 +1,5 @@
 import { Geometry } from './geometry';
-import { GeometryOptions } from './types';
+import { GeoJSONOptions, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
 import { BinaryWriter } from './binarywriter';
@@ -38,7 +38,9 @@ export class LineString extends Geometry {
     return lineString;
   }
 
-  toWkt(): string {
+  toWkt(isNested: boolean = false): string {
+    if (isNested) return this.toInnerWkt();
+
     if (this.points.length === 0) {
       return this.getWktType(GEOMETRY_TYPES.LineString.wkt, true);
     }
@@ -46,11 +48,11 @@ export class LineString extends Geometry {
     return this.getWktType(GEOMETRY_TYPES.LineString.wkt, false) + this.toInnerWkt();
   }
 
-  toInnerWkt(): string {
+  private toInnerWkt(): string {
     let innerWkt = '(';
 
-    for (let i = 0; i < this.points.length; i++) {
-      innerWkt += this.getWktCoordinate(this.points[i]) + ',';
+    for (const point of this.points) {
+      innerWkt += point.toWkt(true) + ',';
     }
 
     innerWkt = innerWkt.slice(0, -1);
@@ -73,18 +75,19 @@ export class LineString extends Geometry {
     return wkb.buffer;
   }
 
-  toTwkb(): Buffer {
+  toTwkb(previousPoint: Point = new Point(0, 0, 0, 0), isNested: boolean = false): Buffer {
     const twkb = new BinaryWriter(0, true);
 
     const precision = Geometry.getTwkbPrecision(5, 0, 0);
     const isEmpty = this.points.length === 0;
 
-    this.writeTwkbHeader(twkb, GEOMETRY_TYPES.LineString.wkb as number, precision, isEmpty);
+    if (!isNested) {
+      this.writeTwkbHeader(twkb, GEOMETRY_TYPES.LineString.wkb as number, precision, isEmpty);
+    }
 
     if (this.points.length > 0) {
       twkb.writeVarInt(this.points.length);
 
-      const previousPoint = new Point(0, 0, 0, 0);
       for (const p of this.points) {
         twkb.writeBuffer(p.toTwkb(previousPoint, true));
       }
@@ -106,18 +109,17 @@ export class LineString extends Geometry {
     return 1 + 4 + 4 + this.points.length * coordinateSize;
   }
 
-  toGeoJSON(options?: any): any {
+  toGeoJSON(options?: GeoJSONOptions, isNested: boolean = false): any {
+    const coordinates: number[] = [];
+    for (const p of this.points) {
+      coordinates.push(p.toGeoJSON(undefined, true));
+    }
+
+    if (isNested) return coordinates;
+
     const geoJSON = super.toGeoJSON(options);
     geoJSON.type = GEOMETRY_TYPES.LineString.geoJSON;
-    geoJSON.coordinates = [];
-
-    for (let i = 0; i < this.points.length; i++) {
-      if (this.hasZ && this.points[i].z !== undefined) {
-        geoJSON.coordinates.push([this.points[i].x, this.points[i].y, this.points[i].z]);
-      } else {
-        geoJSON.coordinates.push([this.points[i].x, this.points[i].y]);
-      }
-    }
+    geoJSON.coordinates = coordinates;
 
     return geoJSON;
   }

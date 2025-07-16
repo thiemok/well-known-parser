@@ -46,8 +46,8 @@ export class MultiPolygon extends Geometry {
 
     let wkt = this.getWktType(GEOMETRY_TYPES.MultiPolygon.wkt, false) + '(';
 
-    for (let i = 0; i < this.polygons.length; i++) {
-      wkt += this.polygons[i].toInnerWkt() + ',';
+    for (const polygon of this.polygons) {
+      wkt += polygon.toWkt(true) + ',';
     }
 
     wkt = wkt.slice(0, -1);
@@ -105,8 +105,8 @@ export class MultiPolygon extends Geometry {
     geoJSON.type = GEOMETRY_TYPES.MultiPolygon.geoJSON;
     geoJSON.coordinates = [];
 
-    for (let i = 0; i < this.polygons.length; i++) {
-      geoJSON.coordinates.push(this.polygons[i].toGeoJSON().coordinates);
+    for (const polygon of this.polygons) {
+      geoJSON.coordinates.push(polygon.toGeoJSON(undefined, true));
     }
 
     return geoJSON;

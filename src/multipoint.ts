@@ -45,8 +45,8 @@ export class MultiPoint extends Geometry {
 
     let wkt = this.getWktType(GEOMETRY_TYPES.MultiPoint.wkt, false) + '(';
 
-    for (let i = 0; i < this.points.length; i++) {
-      wkt += this.getWktCoordinate(this.points[i]) + ',';
+    for (const point of this.points) {
+      wkt += point.toWkt(true) + ',';
     }
 
     wkt = wkt.slice(0, -1);
@@ -62,8 +62,8 @@ export class MultiPoint extends Geometry {
     this.writeWkbType(wkb, GEOMETRY_TYPES.MultiPoint.wkb as number, parentOptions);
     wkb.writeUInt32LE(this.points.length);
 
-    for (let i = 0; i < this.points.length; i++) {
-      wkb.writeBuffer(this.points[i].toWkb({ srid: this.srid }));
+    for (const point of this.points) {
+      wkb.writeBuffer(point.toWkb({ srid: this.srid }));
     }
 
     return wkb.buffer;
@@ -109,8 +109,8 @@ export class MultiPoint extends Geometry {
     geoJSON.type = GEOMETRY_TYPES.MultiPoint.geoJSON;
     geoJSON.coordinates = [];
 
-    for (let i = 0; i < this.points.length; i++) {
-      geoJSON.coordinates.push(this.points[i].toGeoJSON().coordinates);
+    for (const point of this.points) {
+      geoJSON.coordinates.push(point.toGeoJSON(undefined, true));
     }
 
     return geoJSON;

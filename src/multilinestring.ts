@@ -1,5 +1,5 @@
 import { Geometry } from './geometry';
-import { GeometryOptions } from './types';
+import { GeoJSONOptions, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
 import { LineString } from './linestring';
@@ -47,7 +47,7 @@ export class MultiLineString extends Geometry {
     let wkt = this.getWktType(GEOMETRY_TYPES.MultiLineString.wkt, false) + '(';
 
     for (let i = 0; i < this.lineStrings.length; i++) {
-      wkt += this.lineStrings[i].toInnerWkt() + ',';
+      wkt += this.lineStrings[i].toWkt(true) + ',';
     }
 
     wkt = wkt.slice(0, -1);
@@ -63,8 +63,8 @@ export class MultiLineString extends Geometry {
     this.writeWkbType(wkb, GEOMETRY_TYPES.MultiLineString.wkb as number, parentOptions);
     wkb.writeUInt32LE(this.lineStrings.length);
 
-    for (let i = 0; i < this.lineStrings.length; i++) {
-      wkb.writeBuffer(this.lineStrings[i].toWkb({ srid: this.srid }));
+    for (const lineString of this.lineStrings) {
+      wkb.writeBuffer(lineString.toWkb({ srid: this.srid }));
     }
 
     return wkb.buffer;
@@ -83,10 +83,7 @@ export class MultiLineString extends Geometry {
 
       const previousPoint = new Point(0, 0, 0, 0);
       for (const lineString of this.lineStrings) {
-        twkb.writeVarInt(lineString.points.length);
-        for (const p of lineString.points) {
-          twkb.writeBuffer(p.toTwkb(previousPoint, true));
-        }
+        twkb.writeBuffer(lineString.toTwkb(previousPoint, true));
       }
     }
 
@@ -103,13 +100,13 @@ export class MultiLineString extends Geometry {
     return size;
   }
 
-  toGeoJSON(options?: any): any {
+  toGeoJSON(options?: GeoJSONOptions): any {
     const geoJSON = super.toGeoJSON(options);
     geoJSON.type = GEOMETRY_TYPES.MultiLineString.geoJSON;
     geoJSON.coordinates = [];
 
-    for (let i = 0; i < this.lineStrings.length; i++) {
-      geoJSON.coordinates.push(this.lineStrings[i].toGeoJSON().coordinates);
+    for (const lineString of this.lineStrings) {
+      geoJSON.coordinates.push(lineString.toGeoJSON(undefined, true));
     }
 
     return geoJSON;

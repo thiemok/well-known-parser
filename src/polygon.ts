@@ -88,39 +88,41 @@ export class Polygon extends Geometry {
     }
 
     for (const p of this.exteriorRing) {
-        wkb.writeBuffer(p.toWkb(parentOptions));
+      wkb.writeBuffer(p.toWkb(parentOptions, true));
     }
 
     for (const ring of this.interiorRings) {
-        wkb.writeUInt32LE(ring.length);
-        for (const p of ring) {
-            wkb.writeBuffer(p.toWkb(parentOptions));
-        }
+      wkb.writeUInt32LE(ring.length);
+      for (const p of ring) {
+        wkb.writeBuffer(p.toWkb(parentOptions, true));
+      }
     }
 
     return wkb.buffer;
   }
 
-  toTwkb(previousPoint: Point = new Point(0, 0, 0, 0)): Buffer {
+  toTwkb(previousPoint: Point = new Point(0, 0, 0, 0), isNested: boolean = false): Buffer {
     const twkb = new BinaryWriter(0, true);
 
     const precision = Geometry.getTwkbPrecision(5, 0, 0);
     const isEmpty = this.exteriorRing.length === 0;
 
-    this.writeTwkbHeader(twkb, GEOMETRY_TYPES.Polygon.wkb as number, precision, isEmpty);
+    if (!isNested) {
+      this.writeTwkbHeader(twkb, GEOMETRY_TYPES.Polygon.wkb as number, precision, isEmpty);
+    }
 
     if (this.exteriorRing.length > 0) {
       twkb.writeVarInt(1 + this.interiorRings.length);
       twkb.writeVarInt(this.exteriorRing.length);
 
       for (const p of this.exteriorRing) {
-          twkb.writeBuffer(p.toTwkb(previousPoint));
+        twkb.writeBuffer(p.toTwkb(previousPoint, true));
       }
 
       for (const ring of this.interiorRings) {
         twkb.writeVarInt(ring.length);
         for (const p of ring) {
-            twkb.writeBuffer(p.toTwkb(previousPoint));
+          twkb.writeBuffer(p.toTwkb(previousPoint, true));
         }
       }
     }
@@ -141,11 +143,11 @@ export class Polygon extends Geometry {
     let size = 1 + 4 + 4;
 
     if (this.exteriorRing.length > 0) {
-      size += 4 + (this.exteriorRing.length * coordinateSize);
+      size += 4 + this.exteriorRing.length * coordinateSize;
     }
 
     for (let i = 0; i < this.interiorRings.length; i++) {
-      size += 4 + (this.interiorRings[i].length * coordinateSize);
+      size += 4 + this.interiorRings[i].length * coordinateSize;
     }
 
     return size;
@@ -161,7 +163,11 @@ export class Polygon extends Geometry {
 
       for (let i = 0; i < this.exteriorRing.length; i++) {
         if (this.hasZ && this.exteriorRing[i].z !== undefined) {
-          exteriorRing.push([this.exteriorRing[i].x, this.exteriorRing[i].y, this.exteriorRing[i].z]);
+          exteriorRing.push([
+            this.exteriorRing[i].x,
+            this.exteriorRing[i].y,
+            this.exteriorRing[i].z,
+          ]);
         } else {
           exteriorRing.push([this.exteriorRing[i].x, this.exteriorRing[i].y]);
         }
@@ -175,7 +181,11 @@ export class Polygon extends Geometry {
 
       for (let k = 0; k < this.interiorRings[j].length; k++) {
         if (this.hasZ && this.interiorRings[j][k].z !== undefined) {
-          interiorRing.push([this.interiorRings[j][k].x, this.interiorRings[j][k].y, this.interiorRings[j][k].z]);
+          interiorRing.push([
+            this.interiorRings[j][k].x,
+            this.interiorRings[j][k].y,
+            this.interiorRings[j][k].z,
+          ]);
         } else {
           interiorRing.push([this.interiorRings[j][k].x, this.interiorRings[j][k].y]);
         }

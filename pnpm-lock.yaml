@@ -45,6 +45,9 @@ importers:
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
+      type-fest:
+        specifier: ^4.41.0
+        version: 4.41.0
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -1414,6 +1417,10 @@ packages:
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
+
+  type-fest@4.41.0:
+    resolution: {integrity: sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==}
+    engines: {node: '>=16'}
 
   typescript@5.4.2:
     resolution: {integrity: sha512-+2/g0Fds1ERlP6JsakQQDXjZdZMM+rqpamFZJEKh4kwTIn3iDkgKtby0CeNd5ATNZ4Ry1ax15TMx0W2V+miizQ==}
@@ -2845,6 +2852,8 @@ snapshots:
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
+
+  type-fest@4.41.0: {}
 
   typescript@5.4.2: {}
 

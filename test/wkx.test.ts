@@ -4,7 +4,7 @@ import { Buffer } from 'buffer';
 
 import './matchers';
 
-import { MultiPoint, parse, parseGeoJSON, parseTwkb, Point } from '../src';
+import { Geometry, MultiPoint, parse, parseGeoJSON, parseTwkb, Point } from '../src';
 
 import tests2D from './testdata';
 import testsZ from './testdataZ';
@@ -17,6 +17,23 @@ const tests = {
   Z: testsZ,
   M: testsM,
   ZM: testsZM,
+} as const;
+
+type DatasetName = keyof typeof tests;
+type TestDataset = (typeof tests)[DatasetName];
+type TestData = {
+  geometry: () => Geometry;
+  wkbGeometry?: () => Geometry;
+  geoJSONGeometry?: () => Geometry;
+  wkt: string;
+  wkb: string;
+  ewkb: string;
+  wkbXdr: string;
+  ewkbXdr: string;
+  twkb: string;
+  geoJSON: unknown; // TODO: geoJson types
+  ewkbNoSrid: string;
+  ewkbXdrNoSrid: string;
 };
 
 describe('wkx', () => {
@@ -126,15 +143,19 @@ describe('wkx', () => {
 
   // Dynamically generate tests for each test dataset
   // First, we'll build a list of all test cases from all datasets
-  const allTestCases = [];
+  const allTestCases: Array<{
+    datasetName: DatasetName;
+    testName: keyof TestDataset;
+    data: TestData;
+  }> = [];
 
   for (const datasetName in tests) {
-    const dataset = tests[datasetName];
+    const dataset = tests[datasetName as DatasetName];
     for (const testName in dataset) {
       allTestCases.push({
-        datasetName,
-        testName,
-        data: dataset[testName],
+        datasetName: datasetName as DatasetName,
+        testName: testName as keyof TestDataset,
+        data: dataset[testName] as TestData,
       });
     }
   }
@@ -143,15 +164,14 @@ describe('wkx', () => {
     describe('WKT', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
         const parsed = parse(data.wkt);
-        const expected = data.geometry;
+        const expected = data.geometry();
         expect(parsed).toEqual(expected);
       });
     });
 
     describe('WKB', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const geometryExpr = data.wkbGeometry || data.geometry;
-        const expected = geometryExpr;
+        const expected = data.wkbGeometry?.() || data.geometry();
         expected.srid = undefined;
         const parsed = parse(Buffer.from(data.wkb, 'hex'));
         expect(parsed).toEqual(expected);
@@ -160,8 +180,7 @@ describe('wkx', () => {
 
     describe('WKB XDR', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const geometryExpr = data.wkbGeometry || data.geometry;
-        const expected = geometryExpr;
+        const expected = data.wkbGeometry?.() || data.geometry();
         expected.srid = undefined;
         const parsed = parse(Buffer.from(data.wkbXdr, 'hex'));
         expect(parsed).toEqual(expected);
@@ -170,7 +189,7 @@ describe('wkx', () => {
 
     describe('EWKT', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const expected = data.geometry;
+        const expected = data.geometry();
         expected.srid = 4326;
         const parsed = parse('SRID=4326;' + data.wkt);
         expect(parsed).toEqual(expected);
@@ -179,8 +198,7 @@ describe('wkx', () => {
 
     describe('EWKB', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const geometryExpr = data.wkbGeometry || data.geometry;
-        const expected = geometryExpr;
+        const expected = data.wkbGeometry?.() || data.geometry();
         expected.srid = 4326;
         const parsed = parse(Buffer.from(data.ewkb, 'hex'));
         expect(parsed).toEqual(expected);
@@ -189,8 +207,7 @@ describe('wkx', () => {
 
     describe('EWKB XDR', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const geometryExpr = data.wkbGeometry || data.geometry;
-        const expected = geometryExpr;
+        const expected = data.wkbGeometry?.() || data.geometry();
         expected.srid = 4326;
         const parsed = parse(Buffer.from(data.ewkbXdr, 'hex'));
         expect(parsed).toEqual(expected);
@@ -199,7 +216,7 @@ describe('wkx', () => {
 
     describe('TWKB', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const expected = data.geometry;
+        const expected = data.geometry();
         expected.srid = undefined;
         const parsed = parseTwkb(Buffer.from(data.twkb, 'hex'));
         expect(parsed).toEqual(expected);
@@ -208,8 +225,7 @@ describe('wkx', () => {
 
     describe('GeoJSON', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const geometryExpr = data.geoJSONGeometry || data.geometry;
-        const expected = geometryExpr;
+        const expected = data.geoJSONGeometry?.() || data.geometry();
         expected.srid = 4326;
         const parsed = parseGeoJSON(data.geoJSON);
         expect(parsed).toEqual(expected);
@@ -220,21 +236,21 @@ describe('wkx', () => {
   describe('Serialization formats', () => {
     describe('toWkt', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const geometry = data.geometry;
+        const geometry = data.geometry();
         expect(geometry).toMatchWkt(data.wkt);
       });
     });
 
     describe('toWkb', () => {
-      it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const geometry = data.geometry;
+      it.each(allTestCases)('$datasetName - $testName', ({ data, datasetName, testName }) => {
+        const geometry = data.geometry();
         expect(geometry).toMatchWkb(data.wkb);
       });
     });
 
     describe('toEwkt', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const geometry = data.geometry;
+        const geometry = data.geometry();
         geometry.srid = 4326;
         expect(geometry).toMatchEwkt(data.wkt);
       });
@@ -242,7 +258,7 @@ describe('wkx', () => {
 
     describe('toEwkb', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const geometry = data.geometry;
+        const geometry = data.geometry();
         geometry.srid = 4326;
         expect(geometry).toMatchEwkb(data.ewkb);
       });
@@ -250,14 +266,14 @@ describe('wkx', () => {
 
     describe('toTwkb', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const geometry = data.geometry;
+        const geometry = data.geometry();
         expect(geometry).toMatchTwkb(data.twkb);
       });
     });
 
     describe('toGeoJSON', () => {
       it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
-        const geometry = data.geometry;
+        const geometry = data.geometry();
         expect(geometry).toMatchGeoJSON(data.geoJSON);
       });
     });

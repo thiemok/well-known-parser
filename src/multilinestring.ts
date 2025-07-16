@@ -85,7 +85,7 @@ export class MultiLineString extends Geometry {
       for (const lineString of this.lineStrings) {
         twkb.writeVarInt(lineString.points.length);
         for (const p of lineString.points) {
-            twkb.writeBuffer(p.toTwkb(previousPoint));
+          twkb.writeBuffer(p.toTwkb(previousPoint, true));
         }
       }
     }

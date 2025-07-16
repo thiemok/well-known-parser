@@ -67,7 +67,7 @@ export class LineString extends Geometry {
     wkb.writeUInt32LE(this.points.length);
 
     for (const p of this.points) {
-        wkb.writeBuffer(p.toWkb(parentOptions));
+      wkb.writeBuffer(p.toWkb(parentOptions, true));
     }
 
     return wkb.buffer;
@@ -86,7 +86,7 @@ export class LineString extends Geometry {
 
       const previousPoint = new Point(0, 0, 0, 0);
       for (const p of this.points) {
-          twkb.writeBuffer(p.toTwkb(previousPoint));
+        twkb.writeBuffer(p.toTwkb(previousPoint, true));
       }
     }
 
@@ -103,7 +103,7 @@ export class LineString extends Geometry {
       coordinateSize += 8;
     }
 
-    return 1 + 4 + 4 + (this.points.length * coordinateSize);
+    return 1 + 4 + 4 + this.points.length * coordinateSize;
   }
 
   toGeoJSON(options?: any): any {

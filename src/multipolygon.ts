@@ -83,7 +83,7 @@ export class MultiPolygon extends Geometry {
 
       const previousPoint = new Point(0, 0, 0, 0);
       for (const polygon of this.polygons) {
-        twkb.writeBuffer(polygon.toTwkb(previousPoint));
+        twkb.writeBuffer(polygon.toTwkb(previousPoint, true));
       }
     }
 

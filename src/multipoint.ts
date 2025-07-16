@@ -82,7 +82,7 @@ export class MultiPoint extends Geometry {
 
       const previousPoint = new Point(0, 0, 0, 0);
       for (const p of this.points) {
-          twkb.writeBuffer(p.toTwkb(previousPoint));
+        twkb.writeBuffer(p.toTwkb(previousPoint, true));
       }
     }
 
@@ -101,7 +101,7 @@ export class MultiPoint extends Geometry {
 
     coordinateSize += 5;
 
-    return 1 + 4 + 4 + (this.points.length * coordinateSize);
+    return 1 + 4 + 4 + this.points.length * coordinateSize;
   }
 
   toGeoJSON(options?: any): any {

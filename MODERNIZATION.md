@@ -86,6 +86,7 @@ Current Status: 🔄 Planning Phase
 - As this is a fork, we have flexibility to make more substantial changes while keeping the API relatively close to the original
 
 ## TODO
+* [ ] Clean up all serializers to not duplicate logic
 * [ ] Add geo json types to parse
 * [ ] Migrate remaining tests
 * [ ] Clean up old code and configs

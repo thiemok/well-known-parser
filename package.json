@@ -2,35 +2,61 @@
   "name": "wkx",
   "version": "0.5.0",
   "description": "A WKT/WKB/EWKT/EWKB/TWKB/GeoJSON parser and serializer",
-  "main": "lib/wkx.js",
-  "types": "lib/wkx.d.ts",
+  "type": "module",
+  "main": "./dist/wkx.cjs.js",
+  "module": "./dist/wkx.es.js",
+  "browser": "./dist/wkx.umd.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/wkx.es.js",
+      "require": "./dist/wkx.cjs.js",
+      "default": "./dist/wkx.umd.js"
+    }
+  },
   "files": [
     "dist/",
-    "lib/"
+    "src/"
   ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "test": "jshint . && nyc mocha",
-    "build": "mkdirp ./dist && browserify -r buffer -r ./lib/wkx.js:wkx ./lib/wkx.js > ./dist/wkx.js && uglifyjs -c -m -- ./dist/wkx.js > ./dist/wkx.min.js",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "build": "vite build",
+    "build:types": "tsc --emitDeclarationOnly",
+    "coverage": "vitest run --coverage && coveralls < coverage/lcov.info",
+    "prepare": "npm run build"
   },
   "author": "Christian Schwarz",
   "license": "MIT",
   "devDependencies": {
-    "async": "^3.2.0",
-    "browserify": "^16.5.0",
-    "coveralls": "^3.0.11",
-    "deep-eql": "^4.0.0",
-    "jshint": "^2.11.0",
-    "json-stringify-pretty-compact": "^2.0.0",
-    "mkdirp": "^1.0.3",
-    "mocha": "^7.1.1",
-    "nyc": "^15.0.0",
-    "pg": "^7.18.2",
-    "uglify-js": "^3.8.0"
+    "@types/node": "^24.0.13",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "async": "^3.2.6",
+    "coveralls": "^3.1.1",
+    "deep-eql": "^5.0.2",
+    "esbuild": "^0.25.6",
+    "eslint": "^9.31.0",
+    "json-stringify-pretty-compact": "^4.0.0",
+    "mkdirp": "^3.0.1",
+    "pg": "^8.16.3",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3",
+    "vite": "^7.0.4",
+    "vite-plugin-dts": "^3.8.1",
+    "vitest": "^3.2.4"
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/cschwarz/wkx.git"
+    "url": "https://github.com/cschwarz/wkx.git"
   },
   "keywords": [
     "wkt",

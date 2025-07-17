@@ -86,8 +86,6 @@ Current Status: 🔄 Planning Phase
 - As this is a fork, we have flexibility to make more substantial changes while keeping the API relatively close to the original
 
 ## TODO
-* [ ] Eslint no unused
 * [ ] Add geo json types to parse
-* [ ] Clean up old code and configs
 * [ ] Ci and release
 * [ ] Update readme

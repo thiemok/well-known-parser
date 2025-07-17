@@ -88,7 +88,6 @@ Current Status: 🔄 Planning Phase
 ## TODO
 * [ ] Eslint no unused
 * [ ] Add geo json types to parse
-* [ ] Migrate remaining tests
 * [ ] Clean up old code and configs
 * [ ] Ci and release
 * [ ] Update readme

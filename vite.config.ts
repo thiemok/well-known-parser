@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
 
@@ -8,7 +8,7 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'wkx',
       fileName: (format) => `wkx.${format}.js`,
-      formats: ['es', 'cjs', 'umd']
+      formats: ['es', 'cjs', ]
     },
     outDir: 'dist',
     rollupOptions: {
@@ -22,11 +22,7 @@ export default defineConfig({
         // Ensure clean exports
         exports: 'named',
         // Preserve modules structure for tree-shaking
-        preserveModules: false,
-        // Create separate minified versions
-        assetFileNames: (assetInfo) => {
-          return assetInfo.name === 'style.css' ? 'css/[name][extname]' : 'assets/[name][extname]';
-        }
+        preserveModules: true,
       }
     },
     // Generate source maps

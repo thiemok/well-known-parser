@@ -1,4 +1,3 @@
 ## TODO
-* [ ] Clean up vite config
+* [ ] Update readme and package.json
 * [ ] Ci and release
-* [ ] Update readme

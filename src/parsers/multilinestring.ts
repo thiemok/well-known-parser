@@ -1,13 +1,13 @@
-import { BinaryReader } from '../binaryreader';
-import { WktParser } from '../wktparser';
-import { GeometryOptions } from '../types';
+import type { BinaryReader } from '../binaryreader';
+import type { WktParser } from '../wktparser';
+import type { GeometryOptions } from '../types';
 import { MultiLineString } from '../multilinestring';
 import { LineString } from '../linestring';
 import { Point } from '../point';
 import { parseLineStringGeoJSON } from './linestring';
 import { parseRelativePointTwkb } from './point';
 import { parseWkb } from './index';
-import { MultiLineString as GeoJSONMultiLineString } from 'geojson';
+import type { MultiLineString as GeoJSONMultiLineString } from 'geojson';
 
 export function parseMultiLineStringWkt(
   value: WktParser,

@@ -1,9 +1,9 @@
 import { Geometry } from './geometry';
-import { Coordinates, GeometryOptions } from './types';
+import type { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
 import { BinaryWriter } from './binarywriter';
-import { Polygon as GeoJSONPolygon } from 'geojson';
+import type { Polygon as GeoJSONPolygon } from 'geojson';
 
 export class Polygon extends Geometry {
   exteriorRing: Point[];

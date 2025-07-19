@@ -1,9 +1,9 @@
 import { Geometry } from './geometry';
-import { Coordinates, GeometryOptions } from './types';
+import type { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
 import { BinaryWriter } from './binarywriter';
-import { MultiPoint as GeoJSONMultiPoint } from 'geojson';
+import type { MultiPoint as GeoJSONMultiPoint } from 'geojson';
 
 export class MultiPoint extends Geometry {
   points: Point[];

@@ -1,9 +1,9 @@
 import { Geometry } from './geometry';
-import { Coordinates, GeometryOptions } from './types';
+import type { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
 import { BinaryWriter } from './binarywriter';
-import { LineString as GeoJSONLineString } from 'geojson';
+import type { LineString as GeoJSONLineString } from 'geojson';
 
 export class LineString extends Geometry {
   points: Point[];

@@ -1,6 +1,6 @@
-import { BinaryReader } from '../binaryreader';
-import { WktParser } from '../wktparser';
-import { GeometryOptions } from '../types';
+import type { BinaryReader } from '../binaryreader';
+import type { WktParser } from '../wktparser';
+import type { GeometryOptions } from '../types';
 import { Point } from '../point';
 import * as ZigZag from '../zigzag';
 

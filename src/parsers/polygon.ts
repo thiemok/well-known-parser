@@ -1,10 +1,10 @@
-import { BinaryReader } from '../binaryreader';
-import { WktParser } from '../wktparser';
-import { GeometryOptions } from '../types';
+import type { BinaryReader } from '../binaryreader';
+import type { WktParser } from '../wktparser';
+import type { GeometryOptions } from '../types';
 import { Polygon } from '../polygon';
 import { Point } from '../point';
 import { parsePointGeoJSON, parsePointWkb, parseRelativePointTwkb } from './point';
-import { Polygon as GeoJSONPolygon } from 'geojson';
+import type { Polygon as GeoJSONPolygon } from 'geojson';
 
 export function parsePolygonWkt(value: WktParser, options: GeometryOptions): Polygon {
   const polygon = new Polygon();

@@ -1,10 +1,10 @@
-import { BinaryReader } from '../binaryreader';
-import { WktParser } from '../wktparser';
-import { GeometryOptions } from '../types';
+import type { BinaryReader } from '../binaryreader';
+import type { WktParser } from '../wktparser';
+import type { GeometryOptions } from '../types';
 import { LineString } from '../linestring';
 import { Point } from '../point';
 import { parsePointGeoJSON, parsePointWkb, parseRelativePointTwkb } from './point';
-import { LineString as GeoJSONLineString } from 'geojson';
+import type { LineString as GeoJSONLineString } from 'geojson';
 
 export function parseLineStringWkt(value: WktParser, options: GeometryOptions): LineString {
   const lineString = new LineString();

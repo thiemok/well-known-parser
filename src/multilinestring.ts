@@ -1,10 +1,10 @@
 import { Geometry } from './geometry';
-import { Coordinates, GeometryOptions } from './types';
+import type { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
-import { LineString } from './linestring';
+import type { LineString } from './linestring';
 import { BinaryWriter } from './binarywriter';
-import { MultiLineString as GeoJSONMultiLineString } from 'geojson';
+import type { MultiLineString as GeoJSONMultiLineString } from 'geojson';
 
 export class MultiLineString extends Geometry {
   lineStrings: LineString[];

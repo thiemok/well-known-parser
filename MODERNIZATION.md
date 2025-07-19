@@ -86,6 +86,7 @@ Current Status: 🔄 Planning Phase
 - As this is a fork, we have flexibility to make more substantial changes while keeping the API relatively close to the original
 
 ## TODO
-* [ ] Consistent type imports
+* [ ] Clean up remaining lint errors
+* [ ] Clean up vite config
 * [ ] Ci and release
 * [ ] Update readme

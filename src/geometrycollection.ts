@@ -1,8 +1,8 @@
 import { Geometry } from './geometry';
-import { GeometryOptions } from './types';
+import type { GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { BinaryWriter } from './binarywriter';
-import { GeometryCollection as GeoJSONGeometryCollection } from 'geojson';
+import type { GeometryCollection as GeoJSONGeometryCollection } from 'geojson';
 
 export class GeometryCollection extends Geometry {
   geometries: Geometry[];

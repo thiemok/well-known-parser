@@ -1,10 +1,10 @@
 import { GEOMETRY_TYPES } from '../constants';
 import { BinaryReader } from '../binaryreader';
 import { WktParser } from '../wktparser';
-import { GeoJSONGeometry, GeometryOptions } from '../types';
-import { Geometry } from '../geometry';
+import type { GeoJSONGeometry, GeometryOptions } from '../types';
+import type { Geometry } from '../geometry';
 import * as ZigZag from '../zigzag';
-import { GeometryCollection as GeoJSONGeometryCollection } from 'geojson';
+import type { GeometryCollection as GeoJSONGeometryCollection } from 'geojson';
 
 // Import geometry-specific parsers
 import { parsePointGeoJSON, parsePointTwkb, parsePointWkb, parsePointWkt } from './point';

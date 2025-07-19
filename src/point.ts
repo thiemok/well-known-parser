@@ -1,9 +1,9 @@
 import { Geometry } from './geometry';
-import { Coordinates, GeometryOptions } from './types';
+import type { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { BinaryWriter } from './binarywriter';
 import * as ZigZag from './zigzag';
-import { Point as GeoJSONPoint } from 'geojson';
+import type { Point as GeoJSONPoint } from 'geojson';
 
 export class Point extends Geometry {
   x: number;

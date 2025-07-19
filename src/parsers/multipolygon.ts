@@ -1,13 +1,13 @@
-import { BinaryReader } from '../binaryreader';
-import { WktParser } from '../wktparser';
-import { GeometryOptions } from '../types';
+import type { BinaryReader } from '../binaryreader';
+import type { WktParser } from '../wktparser';
+import type { GeometryOptions } from '../types';
 import { MultiPolygon } from '../multipolygon';
 import { Polygon } from '../polygon';
 import { Point } from '../point';
 import { parsePolygonGeoJSON } from './polygon';
 import { parseRelativePointTwkb } from './point';
 import { parseWkb } from './index';
-import { MultiPolygon as GeoJSONMultiPoint } from 'geojson';
+import type { MultiPolygon as GeoJSONMultiPoint } from 'geojson';
 
 export function parseMultiPolygonWkt(value: WktParser, options: GeometryOptions): MultiPolygon {
   const multiPolygon = new MultiPolygon();

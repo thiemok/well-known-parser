@@ -1,4 +1,4 @@
-import {
+import type {
   GeometryCollection as GeoJSONGeometryCollection,
   LineString as GeoJSONLineString,
   MultiLineString as GeoJSONMultiLineString,

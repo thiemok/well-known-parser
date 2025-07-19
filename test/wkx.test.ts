@@ -1,10 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { describe, expect, it } from 'vitest';
 import { Buffer } from 'buffer';
 
 import './matchers';
 
-import { Geometry, MultiPoint, parse, parseGeoJSON, parseTwkb, Point } from '../src';
+import type { Geometry} from '../src';
+import { MultiPoint, parse, parseGeoJSON, parseTwkb, Point } from '../src';
 
 import tests2D from './testdata';
 import testsZ from './testdataZ';

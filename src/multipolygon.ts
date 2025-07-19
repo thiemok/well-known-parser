@@ -1,10 +1,10 @@
 import { Geometry } from './geometry';
-import { Coordinates, GeometryOptions } from './types';
+import type { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
-import { Polygon } from './polygon';
+import type { Polygon } from './polygon';
 import { BinaryWriter } from './binarywriter';
-import { MultiPolygon as GeoJSONMultiPolygon } from 'geojson';
+import type { MultiPolygon as GeoJSONMultiPolygon } from 'geojson';
 
 export class MultiPolygon extends Geometry {
   polygons: Polygon[];

@@ -1,6 +1,6 @@
 import { BinaryWriter } from './binarywriter';
 import * as ZigZag from './zigzag';
-import { GeoJSONGeometry, GeometryOptions, TwkbPrecision } from './types';
+import type { GeoJSONGeometry, GeometryOptions, TwkbPrecision } from './types';
 
 export class Geometry {
   srid?: number;

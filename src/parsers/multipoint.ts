@@ -1,11 +1,11 @@
-import { BinaryReader } from '../binaryreader';
-import { WktParser } from '../wktparser';
-import { GeometryOptions } from '../types';
+import type { BinaryReader } from '../binaryreader';
+import type { WktParser } from '../wktparser';
+import type { GeometryOptions } from '../types';
 import { MultiPoint } from '../multipoint';
 import { Point } from '../point';
 import { parsePointGeoJSON, parseRelativePointTwkb } from './point';
 import { parseWkb } from './index';
-import { MultiPoint as GeoJSONMultiPoint } from 'geojson';
+import type { MultiPoint as GeoJSONMultiPoint } from 'geojson';
 
 export function parseMultiPointWkt(value: WktParser, options: GeometryOptions): MultiPoint {
   const multiPoint = new MultiPoint();

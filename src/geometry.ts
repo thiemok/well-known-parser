@@ -22,9 +22,9 @@ export class Geometry {
     const wkb = this.toWkb();
 
     ewkb.writeInt8(1);
-    ewkb.writeUInt32LE((wkb.slice(1, 5).readUInt32LE(0) | 0x20000000) >>> 0);
+    ewkb.writeUInt32LE((wkb.subarray(1, 5).readUInt32LE(0) | 0x20000000) >>> 0);
     ewkb.writeUInt32LE(this.srid!);
-    ewkb.writeBuffer(wkb.slice(5));
+    ewkb.writeBuffer(wkb.subarray(5));
 
     return ewkb.buffer;
   }

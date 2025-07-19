@@ -86,7 +86,6 @@ Current Status: 🔄 Planning Phase
 - As this is a fork, we have flexibility to make more substantial changes while keeping the API relatively close to the original
 
 ## TODO
-* [ ] Replace deprecated use of Buffer.slice()
 * [ ] Consistent type imports
 * [ ] Ci and release
 * [ ] Update readme

@@ -1,25 +1,20 @@
 {
-  "name": "wkx",
+  "name": "well-known-parser",
   "version": "0.5.0",
   "description": "A WKT/WKB/EWKT/EWKB/TWKB/GeoJSON parser and serializer",
   "type": "module",
-  "main": "./dist/wkx.cjs.js",
-  "module": "./dist/wkx.es.js",
-  "browser": "./dist/wkx.umd.js",
-  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/wkx.es.js",
-      "require": "./dist/wkx.cjs.js",
-      "default": "./dist/wkx.umd.js"
+      "import": "./dist/well-known-parser.es.js",
+      "require": "./dist/well-known-parser.cjs.js",
+      "default": "./dist/well-known-parser.umd.js"
     }
   },
   "files": [
     "dist/",
     "src/"
   ],
-  "sideEffects": false,
   "engines": {
     "node": ">=18.0.0"
   },
@@ -36,7 +31,15 @@
     "coverage": "vitest run --coverage && coveralls < coverage/lcov.info",
     "prepare": "pnpm run build"
   },
-  "author": "Christian Schwarz",
+  "author": {
+    "name": "thiemok",
+    "url": "https://github.com/thiemok"
+  },
+  "contributors": [
+    { "name": "Christian Schwarz",
+      "url": "https://github.com/cschwarz/wkx"
+    }
+  ],
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.31.0",
@@ -61,7 +64,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cschwarz/wkx.git"
+    "url": "https://github.com/thiemok/well-known-parser.git"
   },
   "keywords": [
     "wkt",

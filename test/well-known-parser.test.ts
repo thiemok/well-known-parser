@@ -37,8 +37,8 @@ type TestData = {
   ewkbXdrNoSrid: string;
 };
 
-describe('wkx', () => {
-  describe('Geometry.parse with WKT', () => {
+describe('well-known-parser', () => {
+  describe('parse with WKT', () => {
     const basicPointCases = [
       { input: 'POINT(1 2)', expected: new Point(1, 2) },
       { input: 'POINT(1.2 3.4)', expected: new Point(1.2, 3.4) },

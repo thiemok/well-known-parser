@@ -7,7 +7,7 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'wkx',
-      fileName: (format) => `wkx.${format}.js`,
+      fileName: (format) => `well-known-parser.${format}.js`,
       formats: ['es', 'cjs', ]
     },
     outDir: 'dist',

@@ -24,87 +24,87 @@ export class BinaryWriter {
     }
   }
 
-  writeUInt8(value: number, noAssert?: boolean): void {
+  writeUInt8(value: number): void {
     this.ensureSize(1);
-    this.buffer.writeUInt8(value, this.position, noAssert);
+    this.buffer.writeUInt8(value, this.position);
     this.position += 1;
   }
 
-  writeUInt16LE(value: number, noAssert?: boolean): void {
+  writeUInt16LE(value: number): void {
     this.ensureSize(2);
-    this.buffer.writeUInt16LE(value, this.position, noAssert);
+    this.buffer.writeUInt16LE(value, this.position);
     this.position += 2;
   }
 
-  writeUInt16BE(value: number, noAssert?: boolean): void {
+  writeUInt16BE(value: number): void {
     this.ensureSize(2);
-    this.buffer.writeUInt16BE(value, this.position, noAssert);
+    this.buffer.writeUInt16BE(value, this.position);
     this.position += 2;
   }
 
-  writeUInt32LE(value: number, noAssert?: boolean): void {
+  writeUInt32LE(value: number): void {
     this.ensureSize(4);
-    this.buffer.writeUInt32LE(value, this.position, noAssert);
+    this.buffer.writeUInt32LE(value, this.position);
     this.position += 4;
   }
 
-  writeUInt32BE(value: number, noAssert?: boolean): void {
+  writeUInt32BE(value: number): void {
     this.ensureSize(4);
-    this.buffer.writeUInt32BE(value, this.position, noAssert);
+    this.buffer.writeUInt32BE(value, this.position);
     this.position += 4;
   }
 
-  writeInt8(value: number, noAssert?: boolean): void {
+  writeInt8(value: number): void {
     this.ensureSize(1);
-    this.buffer.writeInt8(value, this.position, noAssert);
+    this.buffer.writeInt8(value, this.position);
     this.position += 1;
   }
 
-  writeInt16LE(value: number, noAssert?: boolean): void {
+  writeInt16LE(value: number): void {
     this.ensureSize(2);
-    this.buffer.writeInt16LE(value, this.position, noAssert);
+    this.buffer.writeInt16LE(value, this.position);
     this.position += 2;
   }
 
-  writeInt16BE(value: number, noAssert?: boolean): void {
+  writeInt16BE(value: number): void {
     this.ensureSize(2);
-    this.buffer.writeInt16BE(value, this.position, noAssert);
+    this.buffer.writeInt16BE(value, this.position);
     this.position += 2;
   }
 
-  writeInt32LE(value: number, noAssert?: boolean): void {
+  writeInt32LE(value: number): void {
     this.ensureSize(4);
-    this.buffer.writeInt32LE(value, this.position, noAssert);
+    this.buffer.writeInt32LE(value, this.position);
     this.position += 4;
   }
 
-  writeInt32BE(value: number, noAssert?: boolean): void {
+  writeInt32BE(value: number): void {
     this.ensureSize(4);
-    this.buffer.writeInt32BE(value, this.position, noAssert);
+    this.buffer.writeInt32BE(value, this.position);
     this.position += 4;
   }
 
-  writeFloatLE(value: number, noAssert?: boolean): void {
+  writeFloatLE(value: number): void {
     this.ensureSize(4);
-    this.buffer.writeFloatLE(value, this.position, noAssert);
+    this.buffer.writeFloatLE(value, this.position);
     this.position += 4;
   }
 
-  writeFloatBE(value: number, noAssert?: boolean): void {
+  writeFloatBE(value: number): void {
     this.ensureSize(4);
-    this.buffer.writeFloatBE(value, this.position, noAssert);
+    this.buffer.writeFloatBE(value, this.position);
     this.position += 4;
   }
 
-  writeDoubleLE(value: number, noAssert?: boolean): void {
+  writeDoubleLE(value: number): void {
     this.ensureSize(8);
-    this.buffer.writeDoubleLE(value, this.position, noAssert);
+    this.buffer.writeDoubleLE(value, this.position);
     this.position += 8;
   }
 
-  writeDoubleBE(value: number, noAssert?: boolean): void {
+  writeDoubleBE(value: number): void {
     this.ensureSize(8);
-    this.buffer.writeDoubleBE(value, this.position, noAssert);
+    this.buffer.writeDoubleBE(value, this.position);
     this.position += 8;
   }
 
@@ -117,13 +117,13 @@ export class BinaryWriter {
   writeVarInt(value: number): number {
     let length = 1;
 
-    while ((value & 0xFFFFFF80) !== 0) {
-      this.writeUInt8((value & 0x7F) | 0x80);
+    while ((value & 0xffffff80) !== 0) {
+      this.writeUInt8((value & 0x7f) | 0x80);
       value >>>= 7;
       length++;
     }
 
-    this.writeUInt8(value & 0x7F);
+    this.writeUInt8(value & 0x7f);
 
     return length;
   }

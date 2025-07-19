@@ -1,8 +1,9 @@
 import { Geometry } from './geometry';
-import { GeoJSONOptions, GeometryOptions } from './types';
+import { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
 import { BinaryWriter } from './binarywriter';
+import { Polygon as GeoJSONPolygon } from 'geojson';
 
 export class Polygon extends Geometry {
   exteriorRing: Point[];
@@ -80,7 +81,7 @@ export class Polygon extends Geometry {
     const wkb = new BinaryWriter(this.getWkbSize());
 
     wkb.writeInt8(1);
-    this.writeWkbType(wkb, GEOMETRY_TYPES.Polygon.wkb as number, parentOptions);
+    this.writeWkbType(wkb, GEOMETRY_TYPES.Polygon.wkb, parentOptions);
 
     if (this.exteriorRing.length > 0) {
       wkb.writeUInt32LE(1 + this.interiorRings.length);
@@ -110,7 +111,7 @@ export class Polygon extends Geometry {
     const isEmpty = this.exteriorRing.length === 0;
 
     if (!isNested) {
-      this.writeTwkbHeader(twkb, GEOMETRY_TYPES.Polygon.wkb as number, precision, isEmpty);
+      this.writeTwkbHeader(twkb, GEOMETRY_TYPES.Polygon.wkb, precision, isEmpty);
     }
 
     if (this.exteriorRing.length > 0) {
@@ -155,14 +156,16 @@ export class Polygon extends Geometry {
     return size;
   }
 
-  toGeoJSON(options?: GeoJSONOptions, isNested: boolean = false): any {
-    const coordinates: number[][][] = [];
+  toGeoJSON(): GeoJSONPolygon;
+  toGeoJSON(isNested: true): Coordinates<GeoJSONPolygon>;
+  toGeoJSON(isNested: boolean = false): GeoJSONPolygon | Coordinates<GeoJSONPolygon> {
+    const coordinates: Coordinates<GeoJSONPolygon> = [];
 
     if (this.exteriorRing.length > 0) {
       const exteriorRing: number[][] = [];
 
       for (const point of this.exteriorRing) {
-        exteriorRing.push(point.toGeoJSON(undefined, true));
+        exteriorRing.push(point.toGeoJSON(true));
       }
 
       coordinates.push(exteriorRing);
@@ -172,17 +175,16 @@ export class Polygon extends Geometry {
       const interiorRing: number[][] = [];
 
       for (const point of ring) {
-        interiorRing.push(point.toGeoJSON(undefined, true));
+        interiorRing.push(point.toGeoJSON(true));
       }
       coordinates.push(interiorRing);
     }
 
     if (isNested) return coordinates;
 
-    const geoJSON = super.toGeoJSON(options);
-    geoJSON.type = GEOMETRY_TYPES.Polygon.geoJSON;
-    geoJSON.coordinates = coordinates;
-
-    return geoJSON;
+    return {
+      type: GEOMETRY_TYPES.Polygon.geoJSON,
+      coordinates,
+    };
   }
 }

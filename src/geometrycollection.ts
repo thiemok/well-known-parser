@@ -2,6 +2,7 @@ import { Geometry } from './geometry';
 import { GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { BinaryWriter } from './binarywriter';
+import { GeometryCollection as GeoJSONGeometryCollection } from 'geojson';
 
 export class GeometryCollection extends Geometry {
   geometries: Geometry[];
@@ -58,7 +59,7 @@ export class GeometryCollection extends Geometry {
     const wkb = new BinaryWriter(this.getWkbSize());
 
     wkb.writeInt8(1);
-    this.writeWkbType(wkb, GEOMETRY_TYPES.GeometryCollection.wkb as number, parentOptions);
+    this.writeWkbType(wkb, GEOMETRY_TYPES.GeometryCollection.wkb, parentOptions);
     wkb.writeUInt32LE(this.geometries.length);
 
     for (let i = 0; i < this.geometries.length; i++) {
@@ -75,7 +76,7 @@ export class GeometryCollection extends Geometry {
     const precision = Geometry.getTwkbPrecision(5, 0, 0);
     const isEmpty = this.geometries.length === 0;
 
-    this.writeTwkbHeader(twkb, GEOMETRY_TYPES.GeometryCollection.wkb as number, precision, isEmpty);
+    this.writeTwkbHeader(twkb, GEOMETRY_TYPES.GeometryCollection.wkb, precision, isEmpty);
 
     if (this.geometries.length > 0) {
       twkb.writeVarInt(this.geometries.length);
@@ -98,15 +99,16 @@ export class GeometryCollection extends Geometry {
     return size;
   }
 
-  toGeoJSON(options?: any): any {
-    const geoJSON = super.toGeoJSON(options);
-    geoJSON.type = GEOMETRY_TYPES.GeometryCollection.geoJSON;
-    geoJSON.geometries = [];
+  toGeoJSON(): GeoJSONGeometryCollection {
+    const geometries: GeoJSONGeometryCollection['geometries'] = [];
 
-    for (let i = 0; i < this.geometries.length; i++) {
-      geoJSON.geometries.push(this.geometries[i].toGeoJSON());
+    for (const geometry of this.geometries) {
+      geometries.push(geometry.toGeoJSON());
     }
 
-    return geoJSON;
+    return {
+      type: GEOMETRY_TYPES.GeometryCollection.geoJSON,
+      geometries,
+    };
   }
 }

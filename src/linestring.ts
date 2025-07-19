@@ -1,8 +1,9 @@
 import { Geometry } from './geometry';
-import { GeoJSONOptions, GeometryOptions } from './types';
+import { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
 import { BinaryWriter } from './binarywriter';
+import { LineString as GeoJSONLineString } from 'geojson';
 
 export class LineString extends Geometry {
   points: Point[];
@@ -65,7 +66,7 @@ export class LineString extends Geometry {
     const wkb = new BinaryWriter(this.getWkbSize());
 
     wkb.writeInt8(1);
-    this.writeWkbType(wkb, GEOMETRY_TYPES.LineString.wkb as number, parentOptions);
+    this.writeWkbType(wkb, GEOMETRY_TYPES.LineString.wkb, parentOptions);
     wkb.writeUInt32LE(this.points.length);
 
     for (const p of this.points) {
@@ -82,7 +83,7 @@ export class LineString extends Geometry {
     const isEmpty = this.points.length === 0;
 
     if (!isNested) {
-      this.writeTwkbHeader(twkb, GEOMETRY_TYPES.LineString.wkb as number, precision, isEmpty);
+      this.writeTwkbHeader(twkb, GEOMETRY_TYPES.LineString.wkb, precision, isEmpty);
     }
 
     if (this.points.length > 0) {
@@ -109,18 +110,19 @@ export class LineString extends Geometry {
     return 1 + 4 + 4 + this.points.length * coordinateSize;
   }
 
-  toGeoJSON(options?: GeoJSONOptions, isNested: boolean = false): any {
-    const coordinates: number[] = [];
+  toGeoJSON(): GeoJSONLineString;
+  toGeoJSON(isNested: true): Coordinates<GeoJSONLineString>;
+  toGeoJSON(isNested: boolean = false): GeoJSONLineString | Coordinates<GeoJSONLineString> {
+    const coordinates: Coordinates<GeoJSONLineString> = [];
     for (const p of this.points) {
-      coordinates.push(p.toGeoJSON(undefined, true));
+      coordinates.push(p.toGeoJSON(true));
     }
 
     if (isNested) return coordinates;
 
-    const geoJSON = super.toGeoJSON(options);
-    geoJSON.type = GEOMETRY_TYPES.LineString.geoJSON;
-    geoJSON.coordinates = coordinates;
-
-    return geoJSON;
+    return {
+      type: GEOMETRY_TYPES.LineString.geoJSON,
+      coordinates,
+    };
   }
 }

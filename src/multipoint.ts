@@ -1,8 +1,9 @@
 import { Geometry } from './geometry';
-import { GeometryOptions } from './types';
+import { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
 import { BinaryWriter } from './binarywriter';
+import { MultiPoint as GeoJSONMultiPoint } from 'geojson';
 
 export class MultiPoint extends Geometry {
   points: Point[];
@@ -59,7 +60,7 @@ export class MultiPoint extends Geometry {
     const wkb = new BinaryWriter(this.getWkbSize());
 
     wkb.writeInt8(1);
-    this.writeWkbType(wkb, GEOMETRY_TYPES.MultiPoint.wkb as number, parentOptions);
+    this.writeWkbType(wkb, GEOMETRY_TYPES.MultiPoint.wkb, parentOptions);
     wkb.writeUInt32LE(this.points.length);
 
     for (const point of this.points) {
@@ -75,7 +76,7 @@ export class MultiPoint extends Geometry {
     const precision = Geometry.getTwkbPrecision(5, 0, 0);
     const isEmpty = this.points.length === 0;
 
-    this.writeTwkbHeader(twkb, GEOMETRY_TYPES.MultiPoint.wkb as number, precision, isEmpty);
+    this.writeTwkbHeader(twkb, GEOMETRY_TYPES.MultiPoint.wkb, precision, isEmpty);
 
     if (this.points.length > 0) {
       twkb.writeVarInt(this.points.length);
@@ -104,15 +105,16 @@ export class MultiPoint extends Geometry {
     return 1 + 4 + 4 + this.points.length * coordinateSize;
   }
 
-  toGeoJSON(options?: any): any {
-    const geoJSON = super.toGeoJSON(options);
-    geoJSON.type = GEOMETRY_TYPES.MultiPoint.geoJSON;
-    geoJSON.coordinates = [];
+  toGeoJSON(): GeoJSONMultiPoint {
+    const coordinates: Coordinates<GeoJSONMultiPoint> = [];
 
     for (const point of this.points) {
-      geoJSON.coordinates.push(point.toGeoJSON(undefined, true));
+      coordinates.push(point.toGeoJSON(true));
     }
 
-    return geoJSON;
+    return {
+      type: GEOMETRY_TYPES.MultiPoint.geoJSON,
+      coordinates,
+    };
   }
 }

@@ -7,6 +7,7 @@ import { Point } from '../point';
 import { parseLineStringGeoJSON } from './linestring';
 import { parseRelativePointTwkb } from './point';
 import { parseWkb } from './index';
+import { MultiLineString as GeoJSONMultiLineString } from 'geojson';
 
 export function parseMultiLineStringWkt(
   value: WktParser,
@@ -87,7 +88,9 @@ export function parseMultiLineStringTwkb(
   return multiLineString;
 }
 
-export function parseMultiLineStringGeoJSON(value: any): MultiLineString {
+export function parseMultiLineStringGeoJSON(
+  value: Pick<GeoJSONMultiLineString, 'coordinates'>
+): MultiLineString {
   const multiLineString = new MultiLineString();
 
   if (value.coordinates.length > 0 && value.coordinates[0].length > 0) {

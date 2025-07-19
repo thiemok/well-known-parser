@@ -1,9 +1,10 @@
 import { Geometry } from './geometry';
-import { GeoJSONOptions, GeometryOptions } from './types';
+import { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
 import { LineString } from './linestring';
 import { BinaryWriter } from './binarywriter';
+import { MultiLineString as GeoJSONMultiLineString } from 'geojson';
 
 export class MultiLineString extends Geometry {
   lineStrings: LineString[];
@@ -60,7 +61,7 @@ export class MultiLineString extends Geometry {
     const wkb = new BinaryWriter(this.getWkbSize());
 
     wkb.writeInt8(1);
-    this.writeWkbType(wkb, GEOMETRY_TYPES.MultiLineString.wkb as number, parentOptions);
+    this.writeWkbType(wkb, GEOMETRY_TYPES.MultiLineString.wkb, parentOptions);
     wkb.writeUInt32LE(this.lineStrings.length);
 
     for (const lineString of this.lineStrings) {
@@ -76,7 +77,7 @@ export class MultiLineString extends Geometry {
     const precision = Geometry.getTwkbPrecision(5, 0, 0);
     const isEmpty = this.lineStrings.length === 0;
 
-    this.writeTwkbHeader(twkb, GEOMETRY_TYPES.MultiLineString.wkb as number, precision, isEmpty);
+    this.writeTwkbHeader(twkb, GEOMETRY_TYPES.MultiLineString.wkb, precision, isEmpty);
 
     if (this.lineStrings.length > 0) {
       twkb.writeVarInt(this.lineStrings.length);
@@ -100,15 +101,16 @@ export class MultiLineString extends Geometry {
     return size;
   }
 
-  toGeoJSON(options?: GeoJSONOptions): any {
-    const geoJSON = super.toGeoJSON(options);
-    geoJSON.type = GEOMETRY_TYPES.MultiLineString.geoJSON;
-    geoJSON.coordinates = [];
+  toGeoJSON(): GeoJSONMultiLineString {
+    const coordinates: Coordinates<GeoJSONMultiLineString> = [];
 
     for (const lineString of this.lineStrings) {
-      geoJSON.coordinates.push(lineString.toGeoJSON(undefined, true));
+      coordinates.push(lineString.toGeoJSON(true));
     }
 
-    return geoJSON;
+    return {
+      type: GEOMETRY_TYPES.MultiLineString.geoJSON,
+      coordinates,
+    };
   }
 }

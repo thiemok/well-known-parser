@@ -4,6 +4,7 @@ import { GeometryOptions } from '../types';
 import { Polygon } from '../polygon';
 import { Point } from '../point';
 import { parsePointGeoJSON, parsePointWkb, parseRelativePointTwkb } from './point';
+import { Polygon as GeoJSONPolygon } from 'geojson';
 
 export function parsePolygonWkt(value: WktParser, options: GeometryOptions): Polygon {
   const polygon = new Polygon();
@@ -106,7 +107,7 @@ export function parsePolygonTwkb(value: BinaryReader, options: GeometryOptions):
   return polygon;
 }
 
-export function parsePolygonGeoJSON(value: any): Polygon {
+export function parsePolygonGeoJSON(value: Pick<GeoJSONPolygon, 'coordinates'>): Polygon {
   const polygon = new Polygon();
 
   if (value.coordinates.length > 0 && value.coordinates[0].length > 0) {

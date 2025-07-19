@@ -1,6 +1,6 @@
 import { BinaryWriter } from './binarywriter';
 import * as ZigZag from './zigzag';
-import { GeoJSONOptions, GeometryOptions, TwkbPrecision } from './types';
+import { GeoJSONGeometry, GeometryOptions, TwkbPrecision } from './types';
 
 export class Geometry {
   srid?: number;
@@ -22,7 +22,7 @@ export class Geometry {
     const wkb = this.toWkb();
 
     ewkb.writeInt8(1);
-    ewkb.writeUInt32LE((wkb.slice(1, 5).readUInt32LE(0) | 0x20000000) >>> 0, true);
+    ewkb.writeUInt32LE((wkb.slice(1, 5).readUInt32LE(0) | 0x20000000) >>> 0);
     ewkb.writeUInt32LE(this.srid!);
     ewkb.writeBuffer(wkb.slice(5));
 
@@ -78,7 +78,7 @@ export class Geometry {
       }
     }
 
-    wkb.writeUInt32LE((dimensionType + geometryType) >>> 0, true);
+    wkb.writeUInt32LE((dimensionType + geometryType) >>> 0);
   }
 
   static getTwkbPrecision(
@@ -130,30 +130,8 @@ export class Geometry {
     }
   }
 
-  toGeoJSON(options?: GeoJSONOptions): any {
-    const geoJSON: any = {};
-
-    if (this.srid) {
-      if (options) {
-        if (options.shortCrs) {
-          geoJSON.crs = {
-            type: 'name',
-            properties: {
-              name: `EPSG:${this.srid}`,
-            },
-          };
-        } else if (options.longCrs) {
-          geoJSON.crs = {
-            type: 'name',
-            properties: {
-              name: `urn:ogc:def:crs:EPSG::${this.srid}`,
-            },
-          };
-        }
-      }
-    }
-
-    return geoJSON;
+  toGeoJSON(): GeoJSONGeometry {
+    throw new Error('Method not implemented.');
   }
 
   // Methods to be implemented by subclasses
@@ -161,7 +139,8 @@ export class Geometry {
     throw new Error('Method not implemented.');
   }
 
-  toWkb(parentOptions?: GeometryOptions): Buffer {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  toWkb(_parentOptions?: GeometryOptions): Buffer {
     throw new Error('Method not implemented.');
   }
 

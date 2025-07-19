@@ -4,6 +4,7 @@ import { GeometryOptions } from '../types';
 import { LineString } from '../linestring';
 import { Point } from '../point';
 import { parsePointGeoJSON, parsePointWkb, parseRelativePointTwkb } from './point';
+import { LineString as GeoJSONLineString } from 'geojson';
 
 export function parseLineStringWkt(value: WktParser, options: GeometryOptions): LineString {
   const lineString = new LineString();
@@ -64,7 +65,7 @@ export function parseLineStringTwkb(value: BinaryReader, options: GeometryOption
   return lineString;
 }
 
-export function parseLineStringGeoJSON(value: any): LineString {
+export function parseLineStringGeoJSON(value: Pick<GeoJSONLineString, 'coordinates'>): LineString {
   const lineString = new LineString();
 
   if (value.coordinates.length > 0) {

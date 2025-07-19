@@ -7,6 +7,7 @@ import { Point } from '../point';
 import { parsePolygonGeoJSON } from './polygon';
 import { parseRelativePointTwkb } from './point';
 import { parseWkb } from './index';
+import { MultiPolygon as GeoJSONMultiPoint } from 'geojson';
 
 export function parseMultiPolygonWkt(value: WktParser, options: GeometryOptions): MultiPolygon {
   const multiPolygon = new MultiPolygon();
@@ -112,7 +113,9 @@ export function parseMultiPolygonTwkb(value: BinaryReader, options: GeometryOpti
   return multiPolygon;
 }
 
-export function parseMultiPolygonGeoJSON(value: any): MultiPolygon {
+export function parseMultiPolygonGeoJSON(
+  value: Pick<GeoJSONMultiPoint, 'coordinates'>
+): MultiPolygon {
   const multiPolygon = new MultiPolygon();
 
   if (

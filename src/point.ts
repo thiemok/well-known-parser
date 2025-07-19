@@ -1,8 +1,9 @@
 import { Geometry } from './geometry';
-import { GeoJSONOptions, GeometryOptions } from './types';
+import { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { BinaryWriter } from './binarywriter';
 import * as ZigZag from './zigzag';
+import { Point as GeoJSONPoint } from 'geojson';
 
 export class Point extends Geometry {
   x: number;
@@ -110,7 +111,7 @@ export class Point extends Geometry {
     const isEmpty = typeof this.x === 'undefined' && typeof this.y === 'undefined';
 
     if (!isNested) {
-      this.writeTwkbHeader(twkb, GEOMETRY_TYPES.Point.wkb as number, precision, isEmpty);
+      this.writeTwkbHeader(twkb, GEOMETRY_TYPES.Point.wkb, precision, isEmpty);
     }
 
     if (isEmpty) {
@@ -174,7 +175,9 @@ export class Point extends Geometry {
     return size;
   }
 
-  toGeoJSON(options?: GeoJSONOptions, isNested: boolean = false): any {
+  toGeoJSON(): GeoJSONPoint;
+  toGeoJSON(isNested: true): Coordinates<GeoJSONPoint>;
+  toGeoJSON(isNested: boolean = false): GeoJSONPoint | Coordinates<GeoJSONPoint> {
     let coordinates: number[];
     if (typeof this.x === 'undefined' && typeof this.y === 'undefined') {
       coordinates = [];
@@ -186,10 +189,9 @@ export class Point extends Geometry {
 
     if (isNested) return coordinates;
 
-    const geoJSON = super.toGeoJSON(options);
-    geoJSON.type = GEOMETRY_TYPES.Point.geoJSON;
-    geoJSON.coordinates = coordinates;
-
-    return geoJSON;
+    return {
+      type: GEOMETRY_TYPES.Point.geoJSON,
+      coordinates,
+    };
   }
 }

@@ -1,9 +1,10 @@
 import { Geometry } from './geometry';
-import { GeometryOptions } from './types';
+import { Coordinates, GeometryOptions } from './types';
 import { GEOMETRY_TYPES } from './constants';
 import { Point } from './point';
 import { Polygon } from './polygon';
 import { BinaryWriter } from './binarywriter';
+import { MultiPolygon as GeoJSONMultiPolygon } from 'geojson';
 
 export class MultiPolygon extends Geometry {
   polygons: Polygon[];
@@ -60,7 +61,7 @@ export class MultiPolygon extends Geometry {
     const wkb = new BinaryWriter(this.getWkbSize());
 
     wkb.writeInt8(1);
-    this.writeWkbType(wkb, GEOMETRY_TYPES.MultiPolygon.wkb as number, parentOptions);
+    this.writeWkbType(wkb, GEOMETRY_TYPES.MultiPolygon.wkb, parentOptions);
     wkb.writeUInt32LE(this.polygons.length);
 
     for (const polygon of this.polygons) {
@@ -76,7 +77,7 @@ export class MultiPolygon extends Geometry {
     const precision = Geometry.getTwkbPrecision(5, 0, 0);
     const isEmpty = this.polygons.length === 0;
 
-    this.writeTwkbHeader(twkb, GEOMETRY_TYPES.MultiPolygon.wkb as number, precision, isEmpty);
+    this.writeTwkbHeader(twkb, GEOMETRY_TYPES.MultiPolygon.wkb, precision, isEmpty);
 
     if (this.polygons.length > 0) {
       twkb.writeVarInt(this.polygons.length);
@@ -100,15 +101,16 @@ export class MultiPolygon extends Geometry {
     return size;
   }
 
-  toGeoJSON(options?: any): any {
-    const geoJSON = super.toGeoJSON(options);
-    geoJSON.type = GEOMETRY_TYPES.MultiPolygon.geoJSON;
-    geoJSON.coordinates = [];
+  toGeoJSON(): GeoJSONMultiPolygon {
+    const coordinates: Coordinates<GeoJSONMultiPolygon> = [];
 
     for (const polygon of this.polygons) {
-      geoJSON.coordinates.push(polygon.toGeoJSON(undefined, true));
+      coordinates.push(polygon.toGeoJSON(true));
     }
 
-    return geoJSON;
+    return {
+      type: GEOMETRY_TYPES.MultiPolygon.geoJSON,
+      coordinates,
+    };
   }
 }

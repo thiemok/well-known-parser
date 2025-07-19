@@ -5,6 +5,7 @@ import { MultiPoint } from '../multipoint';
 import { Point } from '../point';
 import { parsePointGeoJSON, parseRelativePointTwkb } from './point';
 import { parseWkb } from './index';
+import { MultiPoint as GeoJSONMultiPoint } from 'geojson';
 
 export function parseMultiPointWkt(value: WktParser, options: GeometryOptions): MultiPoint {
   const multiPoint = new MultiPoint();
@@ -62,7 +63,7 @@ export function parseMultiPointTwkb(value: BinaryReader, options: GeometryOption
   return multiPoint;
 }
 
-export function parseMultiPointGeoJSON(value: any): MultiPoint {
+export function parseMultiPointGeoJSON(value: Pick<GeoJSONMultiPoint, 'coordinates'>): MultiPoint {
   const multiPoint = new MultiPoint();
 
   if (value.coordinates.length > 0) {

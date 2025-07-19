@@ -1,9 +1,10 @@
 import { GEOMETRY_TYPES } from '../constants';
 import { BinaryReader } from '../binaryreader';
 import { WktParser } from '../wktparser';
-import { GeometryOptions } from '../types';
+import { GeoJSONGeometry, GeometryOptions } from '../types';
 import { Geometry } from '../geometry';
 import * as ZigZag from '../zigzag';
+import { GeometryCollection as GeoJSONGeometryCollection } from 'geojson';
 
 // Import geometry-specific parsers
 import { parsePointGeoJSON, parsePointTwkb, parsePointWkb, parsePointWkt } from './point';
@@ -100,7 +101,6 @@ export function parseWkt(value: string | WktParser, inputOptions?: GeometryOptio
  */
 export function parseWkb(value: Buffer | BinaryReader, parentOptions?: GeometryOptions): Geometry {
   let binaryReader: BinaryReader;
-  let wkbType: number;
   let geometryType: number;
   const options: GeometryOptions = {};
 
@@ -111,7 +111,7 @@ export function parseWkb(value: Buffer | BinaryReader, parentOptions?: GeometryO
   }
 
   binaryReader.isBigEndian = !binaryReader.readInt8();
-  wkbType = binaryReader.readUInt32();
+  const wkbType = binaryReader.readUInt32();
 
   options.hasSrid = (wkbType & 0x20000000) === 0x20000000;
   options.isEwkb = Boolean(wkbType & 0x20000000 || wkbType & 0x40000000 || wkbType & 0x80000000);
@@ -149,19 +149,19 @@ export function parseWkb(value: Buffer | BinaryReader, parentOptions?: GeometryO
   }
 
   switch (geometryType) {
-    case GEOMETRY_TYPES.Point.wkb as number:
+    case GEOMETRY_TYPES.Point.wkb:
       return parsePointWkb(binaryReader, options);
-    case GEOMETRY_TYPES.LineString.wkb as number:
+    case GEOMETRY_TYPES.LineString.wkb:
       return parseLineStringWkb(binaryReader, options);
-    case GEOMETRY_TYPES.Polygon.wkb as number:
+    case GEOMETRY_TYPES.Polygon.wkb:
       return parsePolygonWkb(binaryReader, options);
-    case GEOMETRY_TYPES.MultiPoint.wkb as number:
+    case GEOMETRY_TYPES.MultiPoint.wkb:
       return parseMultiPointWkb(binaryReader, options);
-    case GEOMETRY_TYPES.MultiLineString.wkb as number:
+    case GEOMETRY_TYPES.MultiLineString.wkb:
       return parseMultiLineStringWkb(binaryReader, options);
-    case GEOMETRY_TYPES.MultiPolygon.wkb as number:
+    case GEOMETRY_TYPES.MultiPolygon.wkb:
       return parseMultiPolygonWkb(binaryReader, options);
-    case GEOMETRY_TYPES.GeometryCollection.wkb as number:
+    case GEOMETRY_TYPES.GeometryCollection.wkb:
       return parseGeometryCollectionWkb(binaryReader, options);
     default:
       throw new Error(`GeometryType ${geometryType} not supported`);
@@ -230,19 +230,19 @@ export function parseTwkb(value: Buffer | BinaryReader, inputOptions?: GeometryO
   }
 
   switch (geometryType) {
-    case GEOMETRY_TYPES.Point.wkb as number:
+    case GEOMETRY_TYPES.Point.wkb:
       return parsePointTwkb(binaryReader, options);
-    case GEOMETRY_TYPES.LineString.wkb as number:
+    case GEOMETRY_TYPES.LineString.wkb:
       return parseLineStringTwkb(binaryReader, options);
-    case GEOMETRY_TYPES.Polygon.wkb as number:
+    case GEOMETRY_TYPES.Polygon.wkb:
       return parsePolygonTwkb(binaryReader, options);
-    case GEOMETRY_TYPES.MultiPoint.wkb as number:
+    case GEOMETRY_TYPES.MultiPoint.wkb:
       return parseMultiPointTwkb(binaryReader, options);
-    case GEOMETRY_TYPES.MultiLineString.wkb as number:
+    case GEOMETRY_TYPES.MultiLineString.wkb:
       return parseMultiLineStringTwkb(binaryReader, options);
-    case GEOMETRY_TYPES.MultiPolygon.wkb as number:
+    case GEOMETRY_TYPES.MultiPolygon.wkb:
       return parseMultiPolygonTwkb(binaryReader, options);
-    case GEOMETRY_TYPES.GeometryCollection.wkb as number:
+    case GEOMETRY_TYPES.GeometryCollection.wkb:
       return parseGeometryCollectionTwkb(binaryReader, options);
     default:
       throw new Error(`GeometryType ${geometryType} not supported`);
@@ -252,7 +252,7 @@ export function parseTwkb(value: Buffer | BinaryReader, inputOptions?: GeometryO
 /**
  * Helper function to parse GeoJSON
  */
-export function parseGeoJSON(value: any, isSubGeometry = false): Geometry {
+export function parseGeoJSON(value: GeoJSONGeometry, isSubGeometry = false): Geometry {
   let geometry: Geometry;
 
   switch (value.type) {
@@ -278,26 +278,11 @@ export function parseGeoJSON(value: any, isSubGeometry = false): Geometry {
       geometry = parseGeometryCollectionGeoJSON(value);
       break;
     default:
+      // @ts-expect-error -- fallback for invalid data
       throw new Error(`GeometryType ${value.type} not supported`);
   }
 
-  if (
-    value.crs &&
-    value.crs.type &&
-    value.crs.type === 'name' &&
-    value.crs.properties &&
-    value.crs.properties.name
-  ) {
-    const crs = value.crs.properties.name;
-
-    if (crs.indexOf('EPSG:') === 0) {
-      geometry.srid = parseInt(crs.substring(5));
-    } else if (crs.indexOf('urn:ogc:def:crs:EPSG::') === 0) {
-      geometry.srid = parseInt(crs.substring(22));
-    } else {
-      throw new Error(`Unsupported crs: ${crs}`);
-    }
-  } else if (!isSubGeometry) {
+  if (!isSubGeometry) {
     geometry.srid = 4326;
   }
 
@@ -401,7 +386,9 @@ export function parseGeometryCollectionTwkb(
   return geometryCollection;
 }
 
-export function parseGeometryCollectionGeoJSON(value: any): GeometryCollection {
+export function parseGeometryCollectionGeoJSON(
+  value: Pick<GeoJSONGeometryCollection, 'geometries'>
+): GeometryCollection {
   const geometryCollection = new GeometryCollection();
 
   for (let i = 0; i < value.geometries.length; i++) {

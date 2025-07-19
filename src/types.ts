@@ -1,3 +1,13 @@
+import {
+  GeometryCollection as GeoJSONGeometryCollection,
+  LineString as GeoJSONLineString,
+  MultiLineString as GeoJSONMultiLineString,
+  MultiPoint as GeoJSONMultiPoint,
+  MultiPolygon as GeoJSONMultiPolygon,
+  Point as GeoJSONPoint,
+  Polygon as GeoJSONPolygon,
+} from 'geojson';
+
 export interface GeometryOptions {
   srid?: number;
   hasZ?: boolean;
@@ -18,11 +28,6 @@ export interface GeometryOptions {
   mPrecisionFactor?: number;
 }
 
-export interface GeoJSONOptions {
-  shortCrs?: boolean;
-  longCrs?: boolean;
-}
-
 export interface TwkbPrecision {
   xy: number;
   z: number;
@@ -32,3 +37,14 @@ export interface TwkbPrecision {
   mFactor: number;
 }
 
+export type GeoJSONGeometry =
+  | GeoJSONPoint
+  | GeoJSONMultiPoint
+  | GeoJSONLineString
+  | GeoJSONMultiLineString
+  | GeoJSONPolygon
+  | GeoJSONMultiPolygon
+  | GeoJSONGeometryCollection;
+
+export type Coordinates<T extends Exclude<GeoJSONGeometry, GeoJSONGeometryCollection>> =
+  T['coordinates'];

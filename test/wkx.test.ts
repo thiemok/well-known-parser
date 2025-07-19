@@ -1,10 +1,10 @@
- 
+
 import { describe, expect, it } from 'vitest';
 import { Buffer } from 'buffer';
 
 import './matchers';
 
-import type { Geometry} from '../src';
+import type { GeoJSONGeometry, Geometry } from '../src';
 import { MultiPoint, parse, parseGeoJSON, parseTwkb, Point } from '../src';
 
 import tests2D from './testdata';
@@ -32,7 +32,7 @@ type TestData = {
   wkbXdr: string;
   ewkbXdr: string;
   twkb: string;
-  geoJSON: unknown; // TODO: geoJson types
+  geoJSON: GeoJSONGeometry
   ewkbNoSrid: string;
   ewkbXdrNoSrid: string;
 };
@@ -124,6 +124,7 @@ describe('wkx', () => {
       },
       {
         name: 'unsupported GeoJSON type',
+        // @ts-expect-error -- testing invalid call
         fn: () => parseGeoJSON({ type: 'TEST' }),
         error: /GeometryType TEST not supported/,
       },
@@ -243,7 +244,7 @@ describe('wkx', () => {
     });
 
     describe('toWkb', () => {
-      it.each(allTestCases)('$datasetName - $testName', ({ data, datasetName, testName }) => {
+      it.each(allTestCases)('$datasetName - $testName', ({ data }) => {
         const geometry = data.geometry();
         expect(geometry).toMatchWkb(data.wkb);
       });

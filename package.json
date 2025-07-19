@@ -27,12 +27,14 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint .",
+    "check": "pnpm run '/^check:.*/'",
+    "check:lint": "eslint .",
+    "check:ts": "tsc --noEmit",
     "format": "prettier --write .",
     "build": "vite build",
     "build:types": "tsc --emitDeclarationOnly",
     "coverage": "vitest run --coverage && coveralls < coverage/lcov.info",
-    "prepare": "npm run build"
+    "prepare": "pnpm run build"
   },
   "author": "Christian Schwarz",
   "license": "MIT",

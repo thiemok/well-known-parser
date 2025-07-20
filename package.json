@@ -1,6 +1,6 @@
 {
   "name": "well-known-parser",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "A WKT/WKB/EWKT/EWKB/TWKB/GeoJSON parser and serializer",
   "type": "module",
   "exports": {

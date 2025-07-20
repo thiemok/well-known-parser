@@ -6,9 +6,8 @@
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/well-known-parser.es.js",
-      "require": "./dist/well-known-parser.cjs.js",
-      "default": "./dist/well-known-parser.umd.js"
+      "import": "./dist/well-known-parser.js",
+      "require": "./dist/well-known-parser.cjs"
     }
   },
   "files": [

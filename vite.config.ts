@@ -7,8 +7,8 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'wkx',
-      fileName: (format) => `well-known-parser.${format}.js`,
-      formats: ['es', 'cjs', ]
+      fileName: (format) => `well-known-parser.${format === "cjs" ? "cjs" : "js"}`,
+      formats: ['es', 'cjs']
     },
     outDir: 'dist',
     rollupOptions: {
